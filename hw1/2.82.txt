@@ -1,0 +1,20 @@
+A. No
+   If x = INT_MIN and y = 0, x < y but -x will overflow to -1 
+   since INT_MAX = -INT_MIN-1, thus -1< 0 and -x > -y does not hold.
+
+B. Yes
+   ((x+y)<<4)+y-x = (x+y)*2^4+y-x = (2^4-1)*x + (2^4+1)*y = 15*x + 17*y
+
+C. Yes
+   ~x+~y+1 = -x-1-y-1+1 = -(x+y)-1 = ~(x+y)
+
+D. Yes
+   Since the bit level operation of unsigned and signed arithmetic is the same.
+   By converting both LHS and RHS unsigned, they are now interpreted in the
+   same way with no difference. 
+
+E. Yes
+   (x>>2<<2) will yields a binary representation that has 0 as the last two digits
+   and other digits are the same as x. Since no matter x is positive or negative, 
+   the number with a smaller binary representation has a smaller value,
+   so ((x>>2)<<2) <= x.

@@ -1,0 +1,10 @@
+A. Since the sizeof operator returns a value of type size_t, 
+   and size_t is an unsigned type of value, so the - operator 
+   in maxbytes-sizeof(val) will do unsigned negation.
+   If the result of maxbytes-sizeof(val) is negative, the 
+   result will overflow by maxbytes-sizeof(val)+2^w, so the 
+   result will always be a nonnegative number.
+
+B. change the line "if (maxbytes-sizeof(val) >=0 )" into
+   "if (maxbytes >= 0 && maxbytes >= sizeof(val))". 
+   This will avoid the overflow.
