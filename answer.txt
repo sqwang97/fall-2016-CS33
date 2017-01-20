@@ -1,0 +1,69 @@
+A. (float) x == (float) dx
+	The expression always yields 1.
+	Since the exact numeric value can be preserved by converting int to 
+	double, dx == x. Therefore, converting both of them to float will 
+	result in no overflow and same rounding behavior, thus LHS == RHS.
+	There wil be no difference if we compile with -fwrapv due to no overflow
+	occurs.
+
+B. dx - dy == (double) (x-y)
+	The expression will yield 0 if x is INT_MIN and y is 1.
+	LHS: Since the exact numeric value can be preserved by converting int to 
+	double, and double has a greater range than int, the actual result of 
+	(INT_MAX-1) can be preserved.
+	RHS: Since x and y are int, the result of (x-y) will also be stored in an
+	int. Thus (INT_MIN-1) will result an integer overflow before converting to
+	a double, and LHS != RHS. Therefore the expression yields 0.
+	If we compile with -fwrapv, the overflow in RHS will result in a positive 
+	number, while LHS is a negative number. Thus the result of evaluation is 
+	still 0 with -fwarpv.
+
+C. (dx + dy) + dz == dx + (dy + dz)
+	The expression always yields 1.
+	Since dx, dy and dz are converted to double from int:
+	Check the maximum value bound by let dx, dy, dz equal to INT_MAX:
+	Since INT_MAX is (2^31 -1), and (2^31 -1) + (2^31 -1) + (2^31 -1) = 
+	(3*2^31 -3), which is smaller than the maximum bound of double, thus there
+	is no overflow on this side.
+	Check the minimum value bound by let dx, dy, dz equal to INT_MIN:
+	Since the value of (dx + dy + dz) is greater than the minimum value of
+	double, thus there is no overflow on this side.
+	By checking both the max and min bound, we can see that neither of them 
+	will result in an overflow, thus the associative rule is satified and the 
+	expression always yields 1.
+	There wil be no difference if we compile with -fwrapv due to no overflow
+	occurs.
+
+D. (dx * dy) * dz == dx * (dy * dz)
+	The expression will yields 0 if:
+	dx = 2^31 - 1,	dy = 2^31 - 1, dz = 2^31 - 2.
+	dx, dy and dz cannot exceed 2^31 -1 due to they are converted fron int.
+	LHS = ((2^31 - 1) * (2^31 - 1)) * (2^31 - 2)
+		= (2^62 - 2^32 + 1) * (2^31 - 2)
+	/* round 1 to even, get 0 */
+		= (2^62 - 2^32) * (2^31 - 2)
+		= 2^93 - 2^63 - 2^63 + 2^33
+		= 2^93 - 2^64 + 2^33
+		= 2^93*(1 - 2^-29 + 2^-60)
+	/* since double can only holds 52 fraction bits, we round 2^-60 to even */
+		= 2^93 (1 - 2^-29 + 2^-52)
+	RHS = (2^31 - 1) * ((2^31 - 1) * (2^31 - 2))
+		= (2^31 - 1) * (2^62 - 2^32 - 2^31 + 2)
+		= 2^93 - 2^63 - 2^62 + 2^32 - 2^62 + 2^32 + 2^31 - 2
+		= 2^93 - 2^64 + 2^33 + 2^31 - 2
+		= 2^93*(1 - 2^-29 + 2^-60 + 2^-62 - 2^-92)
+	/* round (2^-60 + 2^-62 - 2^-92) to even */
+		= 2^93*(1 - 2^-29 + 0 )
+		= 2^93*(1 - 2^-29)
+	Therefore, LHS != RHS, the expression will yields 0.
+	There wil be no difference if we compile with -fwrapv due to no overflow
+	occurs.
+
+E. dx / dx == dz / dz
+	The expression will yield 0 if either dx or dz equals to 0.
+	If dx is 0 and dz is 1.
+	LHS = dx/dx = NaN due to division by zero.
+	RHS = dz/dz = 1.
+	Therefore LHS != RHS, the expression yields 0.
+	There wil be no difference if we compile with -fwrapv due to no overflow
+	occurs.
