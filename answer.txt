@@ -1,0 +1,16 @@
+problem 12.18
+
+A. Unsafe
+B. Safe
+C. Unsafe
+
+
+problem 12.24
+
+The functions in the RIO I/O packages are not explicitly reentrant since they 
+have function arguments that are passed by reference. But if the calling
+threads are careful enough to pass pointers to nonshared data, i.e., to avoid 
+referencing the same variable for two or more threads, then these functions
+can be reetrant. Thus, these functions are implicitly reentrant.
+Since both explicitly reentrant and implicitly reentrant are include in 
+the term reentrant, these functions are reentrant.
