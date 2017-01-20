@@ -1,0 +1,73 @@
+Problem 3.67
+A.	
+High Address
+	|		   |		<- %rsp+104
+	|		   |		<- %rsp+96
+	|		   |		<- %rsp+88
+	|		   |		<- %rsp+80
+	|		   |		<- %rsp+72
+	|		   |		<- %rsp+64
+	|		   |
+	|		   |
+	|		   |
+	|		   |
+	|		   |
+	|		   |		<- %rsp+32
+	|z		   |		<- %rsp+24
+	|s.p = &z 	   |		<- %rsp+16
+	|s.a[1] = y	   |		<- %rsp+8
+	|s.a[0] = x	   |		<- %rsp
+Low Address
+
+B.	Since y in %rsi and z in %rdx are pushed on stack before the call, 
+	the only argument that eval passes in its call to process is %rdi,
+	which is the address of %rsp+64. 
+
+C.	Code for process accesses the elements of strA s by deferencing the 
+	stack pointer. Since after the call, stack pointer subtract by 8 to
+	store the return address, all of the values of s stored on stack is 
+	now begin with %rsp+8.
+	Thus, process accesses x by %rsp+8, y by %rsp+16, &z by %rsp+24.
+
+D.	The function process stores the elements of strB r starting at %rsp+64.
+	It stores y at %rdi, x at %rdi+8 and z at %rdi+16. 
+
+E.
+High Address
+	|		   |		<- %rsp+104
+	|		   |		<- %rsp+96
+	|		   |		<- %rsp+88
+	|r.q = z   	   |		<- %rsp+80
+	|r.u[1] = x	   |		<- %rsp+72
+	|r.u[0] = y	   |		<- %rsp+64
+	|		   |		
+	|		   |
+	|		   |
+	|		   |
+	|		   |
+	|		   |		<- %rsp+32
+	|z		   |		<- %rsp+24
+	|s.p = &z  	   |		<- %rsp+16
+	|s.a[1] = y	   |		<- %rsp+8
+	|s.a[0] = x	   |		<- %rsp
+Low Address
+
+The function eval accesses r.u[0] by %rsp+64, r.u[1] by %rsp+72, and
+r.q by %rsp+80
+
+F.	Structure values are passed as function arguments by addresses on stack,
+	they are returned as function results also by addresses on stack.
+
+
+Problem 3.70
+A.	el.p: 0
+	el.y: 8	
+	e2.x: 0
+	e2.next: 8
+
+B.	16 bytes in total.
+
+C.	
+void proc (union ele •up) {
+	up->e2.x = *(up->e2.next->e1.p) - up->e2.next->e1.y;
+}
