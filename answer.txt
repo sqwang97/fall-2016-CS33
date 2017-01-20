@@ -1,0 +1,18 @@
+A. Which registers hold program values x, n, result, and mask?
+	%rdi holds x, %esi holds %esi, %rax holds results, and %rdx holds mask.
+
+B. What are the initial values of result and mask?
+	The initial value for result is 0,
+	the initial value for mask is 1.
+
+C. What is the test condition for mask?
+	The test condition for mask is to test whether mask is nonzero:
+	mask != 0
+
+D. How does mask get updated?
+	It is shifted  by the value of last 8 bits in n:
+	mask = mask << n
+
+E. How does result get updated?
+	The result is updated by an OR operation with x&mask:
+	result |= (x&mask)
