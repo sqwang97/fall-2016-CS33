@@ -1,0 +1,49 @@
+1.
+0x0000000000541f40 <arith_driver+576>data.c:2645    imul %rdi,%rbx
+This instruction cause the overflow problem. Since only the last
+64-bits of the result is stored in %rax register, the original result
+has its higher bits stored in %rdx, which will not be returned and
+thus cause the result being wrong.
+
+2.
+From data.c, we can see that the value of most-positive-fixnum is
+Vmost_positive_fixnum. Since we are running on a 64-bits machine,
+Vmost_positive_fixnum is 2^61-1, which is exactly 2305843009213693951.
+
+3.
+The check of whether an int multiplication is overflowed is in data.c
+from line 2637 to line 2646. We can see that if the multiplication is
+overflowed, the overflowed value will be masked with an INTMASK:
+	    accum &= INTMASK
+And INTMASK is defined as (EMACS_INT_MAX >> (INTTYPEBITS - 1)), which
+is 0x3fffffffffffffff, in lisp.h.
+Since the command will result in an integer multiplication overflow,
+its result will wrap to 0xc000000000000001. Taking this value to mask
+with INTMASK, we will get the output 0x1. 
+
+4.
+If it is compiled with -fsanitize=undefined, the compiler will detect
+whether there is an overflow in the runtime. If an overflow does
+happen, a library function will be called to handle the overflow, thus
+we may get th right result if we are doing overflow comparison, but we
+will receive a warning message from gcc when our input results in
+integer overflow.
+
+5.
+-fwrap assumes the two's complement arithmetic and it will
+automatically wrap around when an overflow occurs. It will not report
+the overflow to the user, thus the user will not know whether the
+result they get is true or not. 
+
+6.
+Since -fwraps does the automatic wrap around when overflow happens,
+there is no need to for emacs to check the overflow any more. Thus,
+its performance should improve due to the remove of integer overflow
+check, which requires many instructions. 
+
+7.
+According to our recorded trace, we may take around 30 instructions
+off in overall 155 instructions if we eliminate the overflow check. In
+this case, the maximum improvement is 20%. However, since each
+instrcution is executed with a very small amount of time, the
+efficiency difference may not be as significant as it seems.
